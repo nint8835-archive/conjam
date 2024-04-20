@@ -3,7 +3,9 @@ pub type ImageData
 pub type Pixel =
   #(Int, Int, Int, Int)
 
-const canvas_width = 640
+pub const canvas_width = 640
+
+pub const canvas_height = 480
 
 @external(javascript, "../ffi.mjs", "getIndex")
 pub fn get_index(image_data: ImageData, index: Int) -> Pixel
