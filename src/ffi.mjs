@@ -23,3 +23,21 @@ export function setIndex(imageData, index, value) {
 
   return imageData;
 }
+
+/**
+ * Mutates a frame.
+ * @param {(ImageData) -> ImageData} mutator - The mutator function.
+ */
+export function mutateFrame(mutator) {
+  const canvas = document.getElementById("canvas");
+  const context = canvas.getContext("2d");
+
+  const initialImageData = context.getImageData(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+  const mutatedImageData = mutator(initialImageData);
+  context.putImageData(mutatedImageData, 0, 0);
+}

@@ -1,38 +1,30 @@
-import gleam/javascript/array
+import canvas/canvas
+import gleam/float
+import gleam/int
 import gleam/list
 
-type Pixel =
-  #(Int, Int, Int, Int)
-
-fn create_pixel(data: List(Int)) -> Pixel {
-  case data {
-    [r, g, b, a] -> #(r, g, b, a)
-    _ -> panic("Invalid input")
-  }
+fn scale(max_val: Int, target_num: Int, current_val: Int) -> Int {
+  float.truncate(
+    int.to_float(current_val)
+    /. int.to_float(max_val)
+    *. int.to_float(target_num),
+  )
 }
 
-fn deconstruct_pixel(pixel: Pixel) -> List(Int) {
-  let #(r, g, b, a) = pixel
-  [r, g, b, a]
-}
+pub fn create_test_pixels() {
+  use data <- canvas.mutate_frame()
 
-fn process_pixel(_: Pixel, i: Int) -> Pixel {
-  case i % 11 {
-    0 -> #(255, 0, 0, 255)
-    1 -> #(0, 255, 0, 255)
-    2 -> #(0, 0, 255, 255)
-    3 -> #(255, 255, 0, 255)
-    _ -> #(0, 0, 0, 255)
-  }
-}
-
-pub fn generate_image_data(in: array.Array(Int)) -> array.Array(Int) {
-  in
-  |> array.to_list
-  |> list.sized_chunk(into: 4)
-  |> list.map(create_pixel)
-  |> list.index_map(process_pixel)
-  |> list.map(deconstruct_pixel)
-  |> list.flatten
-  |> array.from_list
+  list.range(0, 479)
+  |> list.fold(data, fn(row_data, y) {
+    list.range(0, 639)
+    |> list.fold(row_data, fn(current_data, x) {
+      current_data
+      |> canvas.set_pixel(x, y, #(
+        scale(640, 255, x),
+        scale(480, 255, y),
+        scale({ 640 + 480 }, 255, x + y),
+        255,
+      ))
+    })
+  })
 }
