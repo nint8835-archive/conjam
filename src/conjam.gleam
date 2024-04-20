@@ -1,7 +1,6 @@
 import canvas/canvas
 import gleam/float
 import gleam/int
-import gleam/list
 
 fn scale(max_val: Int, target_num: Int, current_val: Int) -> Int {
   float.truncate(
@@ -11,20 +10,32 @@ fn scale(max_val: Int, target_num: Int, current_val: Int) -> Int {
   )
 }
 
+fn iter_pixels(
+  frame_number: Int,
+  index: Int,
+  frame_data: canvas.ImageData,
+) -> canvas.ImageData {
+  case index {
+    307_200 -> frame_data
+    _ ->
+      iter_pixels(
+        frame_number,
+        index + 1,
+        canvas.set_index(frame_data, index, {
+          let y = index / 640
+          let x = index % 640
+          let r = scale(640, 255, x)
+          let g = scale(480, 255, y)
+          let b = scale(255, 255, frame_number)
+
+          #(r, g, b, 255)
+        }),
+      )
+  }
+}
+
 pub fn draw_frame(frame_number: Int) {
   use data <- canvas.mutate_frame()
 
-  list.range(0, 479)
-  |> list.fold(data, fn(row_data, y) {
-    list.range(0, 639)
-    |> list.fold(row_data, fn(current_data, x) {
-      current_data
-      |> canvas.set_pixel(x, y, #(
-        scale(640, 255, x + frame_number),
-        scale(480, 255, y + frame_number),
-        0,
-        255,
-      ))
-    })
-  })
+  iter_pixels(frame_number, 0, data)
 }
