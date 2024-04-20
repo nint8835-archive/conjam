@@ -1,0 +1,21 @@
+{
+    "editor.formatOnSave": true,
+    "files.exclude": {
+        "build/**": true,
+        "frontend/dist/**": true,
+        "frontend/node_modules/**": true
+    },
+
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "always"
+        }
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "always"
+        }
+    }
+}
