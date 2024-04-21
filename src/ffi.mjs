@@ -5,7 +5,14 @@
  * @returns {Array<number>} The pixel data.
  */
 export function getIndex(imageData, index) {
-  return imageData.data.slice(index * 4, index * 4 + 4);
+  const data = imageData.data;
+  const baseIndex = index * 4;
+  return [
+    data[baseIndex],
+    data[baseIndex + 1],
+    data[baseIndex + 2],
+    data[baseIndex + 3],
+  ];
 }
 
 /**
