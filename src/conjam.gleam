@@ -8,7 +8,10 @@ fn iter_pixels(
   case index {
     -1 -> frame_data
     _ -> {
-      let new_frame_data = case index / canvas.canvas_width == 479 {
+      let new_frame_data = case
+        index / canvas.canvas_width
+        == canvas.canvas_height - 1
+      {
         True -> frame_data
         False -> {
           let pixel_val =
@@ -59,13 +62,4 @@ pub fn draw_frame(
     canvas.canvas_height * canvas.canvas_width,
     initial_data,
   )
-}
-
-pub fn on_click(x: Int, y: Int) {
-  use data <- canvas.mutate_frame()
-
-  let index = y * canvas.canvas_width + x
-
-  data
-  |> canvas.set_index(index, #(255, 255, 255, 255))
 }
