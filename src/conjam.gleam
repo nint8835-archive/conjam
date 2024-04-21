@@ -6,7 +6,7 @@ fn iter_pixels(
   frame_data: canvas.ImageData,
 ) -> canvas.ImageData {
   case index {
-    0 -> frame_data
+    -1 -> frame_data
     _ -> {
       let new_frame_data = case index / canvas.canvas_width == 479 {
         True -> frame_data
