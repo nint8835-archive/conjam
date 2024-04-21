@@ -26,6 +26,6 @@ jobs:
       - uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: frontend/build
+          folder: frontend/dist
           clean: true
           token: ${{ secrets.GITHUB_TOKEN }}
