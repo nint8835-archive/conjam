@@ -27,7 +27,35 @@ fn iter_pixels(
               frame_data
               |> canvas.set_index(index + canvas.canvas_width, pixel_val)
               |> canvas.set_index(index, #(0, 0, 0, 0))
-            _, _ -> frame_data
+            _, _ -> {
+              let diagonal_left_val =
+                frame_data
+                |> canvas.get_index(index + canvas.canvas_width - 1)
+              let diagonal_right_val =
+                frame_data
+                |> canvas.get_index(index + canvas.canvas_width + 1)
+              let x = index % canvas.canvas_width
+
+              case diagonal_left_val, diagonal_right_val {
+                #(0, 0, 0, 0), _ if x > 0 -> {
+                  frame_data
+                  |> canvas.set_index(
+                    index + canvas.canvas_width - 1,
+                    pixel_val,
+                  )
+                  |> canvas.set_index(index, #(0, 0, 0, 0))
+                }
+                _, #(0, 0, 0, 0) if x < 639 -> {
+                  frame_data
+                  |> canvas.set_index(
+                    index + canvas.canvas_width + 1,
+                    pixel_val,
+                  )
+                  |> canvas.set_index(index, #(0, 0, 0, 0))
+                }
+                _, _ -> frame_data
+              }
+            }
           }
         }
       }
