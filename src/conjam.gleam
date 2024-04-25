@@ -36,7 +36,7 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
           |> canvas.set_index(index + canvas.canvas_width - 1, pixel_val)
           |> canvas.set_index(index, #(0, 0, 0, 0))
         }
-        _, _, _, #(0, 0, 0, 0) if x < 639 -> {
+        _, _, _, #(0, 0, 0, 0) if x < 159 -> {
           frame_data
           |> canvas.set_index(index + canvas.canvas_width + 1, pixel_val)
           |> canvas.set_index(index, #(0, 0, 0, 0))

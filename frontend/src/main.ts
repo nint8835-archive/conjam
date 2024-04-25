@@ -1,6 +1,8 @@
 import { draw_frame } from '@/conjam.mjs';
 import './index.css';
 
+const scaleFactor = 4;
+
 let frameNumber = 0;
 let lastFrameTime = performance.now();
 let mouseDown = false;
@@ -27,15 +29,15 @@ function init() {
 
     canvas.addEventListener('mousedown', (event) => {
         mouseDown = true;
-        mouseX = event.offsetX;
-        mouseY = event.offsetY;
+        mouseX = Math.trunc(event.offsetX / scaleFactor);
+        mouseY = Math.trunc(event.offsetY / scaleFactor);
     });
     canvas.addEventListener('mouseup', () => {
         mouseDown = false;
     });
     canvas.addEventListener('mousemove', (event) => {
-        mouseX = event.offsetX;
-        mouseY = event.offsetY;
+        mouseX = Math.trunc(event.offsetX / scaleFactor);
+        mouseY = Math.trunc(event.offsetY / scaleFactor);
     });
 
     requestAnimationFrame(tickFrame);
