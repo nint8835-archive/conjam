@@ -1,7 +1,7 @@
 import { draw_frame } from '@/conjam.mjs';
 import './index.css';
 
-const scaleFactor = 4;
+const scaleFactor = 1;
 
 let frameNumber = 0;
 let lastFrameTime = performance.now();

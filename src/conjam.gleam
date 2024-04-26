@@ -4,23 +4,9 @@ import gleam/int
 import gleam/list
 import gleam/result
 
-const max_x = 159
+const max_x = 639
 
-const max_y = 119
-
-fn average_channel(values: List(Int)) -> Int {
-  values
-  |> list.fold(0.0, fn(acc, x) {
-    x
-    |> int.power(2.0)
-    |> result.unwrap(0.0)
-    |> fn(x) { x +. acc }
-  })
-  |> fn(x) { x /. int.to_float(list.length(values)) }
-  |> float.square_root()
-  |> result.unwrap(0.0)
-  |> float.truncate()
-}
+const max_y = 479
 
 fn random_colour() -> canvas.Pixel {
   let colours = [#(255, 0, 0, 255), #(0, 255, 0, 255), #(0, 0, 255, 255)]
@@ -29,64 +15,6 @@ fn random_colour() -> canvas.Pixel {
   |> list.shuffle()
   |> list.first()
   |> result.unwrap(#(0, 0, 0, 0))
-}
-
-fn average_pixels(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
-  let x = index % canvas.canvas_width
-  let y = index / canvas.canvas_width
-
-  case y == max_y || x == 0 || x == max_x {
-    True -> frame_data
-    False -> {
-      let pixel_val =
-        frame_data
-        |> canvas.get_index(index)
-
-      case pixel_val {
-        #(0, 0, 0, 0) -> frame_data
-        _ -> {
-          let down_left_pixel_val =
-            frame_data
-            |> canvas.get_index(index + canvas.canvas_width - 1)
-          let down_pixel_val =
-            frame_data
-            |> canvas.get_index(index + canvas.canvas_width)
-          let down_right_pixel_val =
-            frame_data
-            |> canvas.get_index(index + canvas.canvas_width + 1)
-
-          let pixels =
-            [
-              pixel_val,
-              down_left_pixel_val,
-              down_pixel_val,
-              down_right_pixel_val,
-            ]
-            |> list.filter(fn(x) { x != #(0, 0, 0, 0) })
-
-          frame_data
-          |> canvas.set_index(index, #(
-            average_channel(
-              pixels
-              |> list.map(fn(x) { x.0 }),
-            ),
-            average_channel(
-              pixels
-              |> list.map(fn(x) { x.1 }),
-            ),
-            average_channel(
-              pixels
-              |> list.map(fn(x) { x.2 }),
-            ),
-            average_channel(
-              pixels
-              |> list.map(fn(x) { x.3 }),
-            ),
-          ))
-        }
-      }
-    }
-  }
 }
 
 fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
@@ -147,7 +75,6 @@ fn iter_pixels(
       let new_frame_data =
         frame_data
         |> apply_gravity(index)
-        |> average_pixels(index)
 
       iter_pixels(new_frame_data, frame_number, index - 1)
     }
