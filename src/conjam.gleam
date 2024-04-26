@@ -6,6 +6,8 @@ import gleam/result
 
 const max_x = 159
 
+const max_y = 119
+
 fn average_channel(values: List(Int)) -> Int {
   values
   |> list.fold(0.0, fn(acc, x) {
@@ -29,11 +31,69 @@ fn random_colour() -> canvas.Pixel {
   |> result.unwrap(#(0, 0, 0, 0))
 }
 
+fn average_pixels(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
+  let x = index % canvas.canvas_width
+  let y = index / canvas.canvas_width
+
+  case y == max_y || x == 0 || x == max_x {
+    True -> frame_data
+    False -> {
+      let pixel_val =
+        frame_data
+        |> canvas.get_index(index)
+
+      case pixel_val {
+        #(0, 0, 0, 0) -> frame_data
+        _ -> {
+          let down_left_pixel_val =
+            frame_data
+            |> canvas.get_index(index + canvas.canvas_width - 1)
+          let down_pixel_val =
+            frame_data
+            |> canvas.get_index(index + canvas.canvas_width)
+          let down_right_pixel_val =
+            frame_data
+            |> canvas.get_index(index + canvas.canvas_width + 1)
+
+          let pixels =
+            [
+              pixel_val,
+              down_left_pixel_val,
+              down_pixel_val,
+              down_right_pixel_val,
+            ]
+            |> list.filter(fn(x) { x != #(0, 0, 0, 0) })
+
+          frame_data
+          |> canvas.set_index(index, #(
+            average_channel(
+              pixels
+              |> list.map(fn(x) { x.0 }),
+            ),
+            average_channel(
+              pixels
+              |> list.map(fn(x) { x.1 }),
+            ),
+            average_channel(
+              pixels
+              |> list.map(fn(x) { x.2 }),
+            ),
+            average_channel(
+              pixels
+              |> list.map(fn(x) { x.3 }),
+            ),
+          ))
+        }
+      }
+    }
+  }
+}
+
 fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   let x = index % canvas.canvas_width
   let y = index / canvas.canvas_width
 
-  case y == canvas.canvas_height - 1 {
+  case y == max_y {
     True -> frame_data
     False -> {
       let pixel_val =
@@ -70,17 +130,6 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
           |> canvas.set_index(index + canvas.canvas_width + 1, pixel_val)
           |> canvas.set_index(index, #(0, 0, 0, 0))
         }
-        #(r1, g1, b1, a1),
-          #(r2, g2, b2, a2),
-          #(r3, g3, b3, a3),
-          #(r4, g4, b4, a4) if x < max_x && x > 0 ->
-          frame_data
-          |> canvas.set_index(index + canvas.canvas_width, #(
-            average_channel([r1, r2, r3, r4]),
-            average_channel([g1, g2, g3, g4]),
-            average_channel([b1, b2, b3, b4]),
-            average_channel([a1, a2, a3, a4]),
-          ))
         _, _, _, _ -> frame_data
       }
     }
@@ -95,15 +144,10 @@ fn iter_pixels(
   case index {
     -1 -> frame_data
     _ -> {
-      let new_frame_data = case
-        index / canvas.canvas_width
-        == canvas.canvas_height - 1
-      {
-        True -> frame_data
-        False ->
-          frame_data
-          |> apply_gravity(index)
-      }
+      let new_frame_data =
+        frame_data
+        |> apply_gravity(index)
+        |> average_pixels(index)
 
       iter_pixels(new_frame_data, frame_number, index - 1)
     }
