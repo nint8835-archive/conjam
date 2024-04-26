@@ -8,12 +8,12 @@ const max_x = 159
 
 fn average_channel(values: List(Int)) -> Int {
   values
-  |> list.map(fn(x) {
+  |> list.fold(0.0, fn(acc, x) {
     x
     |> int.power(2.0)
     |> result.unwrap(0.0)
+    |> fn(x) { x +. acc }
   })
-  |> list.fold(0.0, fn(x, acc) { x +. acc })
   |> fn(x) { x /. int.to_float(list.length(values)) }
   |> float.square_root()
   |> result.unwrap(0.0)
@@ -75,7 +75,7 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
           #(r3, g3, b3, a3),
           #(r4, g4, b4, a4) if x < max_x && x > 0 ->
           frame_data
-          |> canvas.set_index(index, #(
+          |> canvas.set_index(index + canvas.canvas_width, #(
             average_channel([r1, r2, r3, r4]),
             average_channel([g1, g2, g3, g4]),
             average_channel([b1, b2, b3, b4]),
