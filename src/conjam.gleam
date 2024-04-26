@@ -154,7 +154,7 @@ fn iter_pixels(
   }
 }
 
-const brush_size = 5
+const brush_size = 10
 
 fn apply_brush(
   frame_data: canvas.ImageData,
@@ -163,12 +163,31 @@ fn apply_brush(
 ) -> canvas.ImageData {
   let colour = random_colour()
 
-  list.range(brush_size / -2, brush_size / 2 + 1)
+  list.range(-1 * brush_size, brush_size)
   |> list.fold(frame_data, fn(row_data, y) {
-    list.range(brush_size / -2, brush_size / 2 + 1)
+    list.range(-1 * brush_size, brush_size)
     |> list.fold(row_data, fn(pixel_data, x) {
-      pixel_data
-      |> canvas.set_pixel(mouse_x + x, mouse_y + y, colour)
+      let distance =
+        float.square_root(
+          {
+            int.power(x, 2.0)
+            |> result.unwrap(0.0)
+          }
+          +. {
+            int.power(y, 2.0)
+            |> result.unwrap(0.0)
+          },
+        )
+        |> result.unwrap(0.0)
+        |> float.round()
+
+      case distance > brush_size {
+        True -> pixel_data
+        False -> {
+          pixel_data
+          |> canvas.set_pixel(mouse_x + x, mouse_y + y, colour)
+        }
+      }
     })
   })
 }
