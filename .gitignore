@@ -22,3 +22,5 @@ go.work
 
 site/conjam.wasm
 site/wasm_exec.js
+
+.idea/
