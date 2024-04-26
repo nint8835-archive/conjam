@@ -38,29 +38,29 @@ func (g *Game) Layout(_ int, _ int) (int, int) {
 	return Width, Height
 }
 
-func applyGravity(x, y int, pixels PixelArray) {
+func (g *Game) applyGravity(x, y int) {
 	if y == Height-1 {
 		return
 	}
 
-	pixel := pixels.At(x, y)
+	pixel := g.pixels.At(x, y)
 
-	if pixels.At(x, y+1).A == 0 {
-		pixels.Set(x, y+1, pixel)
-		pixels.Set(x, y, Pixel{0, 0, 0, 0})
-	} else if x > 0 && pixels.At(x-1, y+1).A == 0 {
-		pixels.Set(x-1, y+1, pixel)
-		pixels.Set(x, y, Pixel{0, 0, 0, 0})
-	} else if x < Width-1 && pixels.At(x+1, y+1).A == 0 {
-		pixels.Set(x+1, y+1, pixel)
-		pixels.Set(x, y, Pixel{0, 0, 0, 0})
+	if g.pixels.At(x, y+1).A == 0 {
+		g.pixels.Set(x, y+1, pixel)
+		g.pixels.Set(x, y, Pixel{0, 0, 0, 0})
+	} else if x > 0 && g.pixels.At(x-1, y+1).A == 0 {
+		g.pixels.Set(x-1, y+1, pixel)
+		g.pixels.Set(x, y, Pixel{0, 0, 0, 0})
+	} else if x < Width-1 && g.pixels.At(x+1, y+1).A == 0 {
+		g.pixels.Set(x+1, y+1, pixel)
+		g.pixels.Set(x, y, Pixel{0, 0, 0, 0})
 	}
 }
 
 func (g *Game) Update() error {
 	for y := Height - 1; y >= 0; y-- {
 		for x := Width - 1; x >= 0; x-- {
-			applyGravity(x, y, g.pixels)
+			g.applyGravity(x, y)
 		}
 	}
 
