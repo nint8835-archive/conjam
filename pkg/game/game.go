@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"math"
 	"math/rand/v2"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -10,6 +11,8 @@ import (
 
 const Width = 640
 const Height = 480
+
+const brushSize = 20
 
 type PixelArray []byte
 
@@ -57,6 +60,31 @@ func (g *Game) applyGravity(x, y int) {
 	}
 }
 
+func (g *Game) applyBrush() {
+	if !ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		return
+	}
+
+	cursorX, cursorY := ebiten.CursorPosition()
+
+	for x := cursorX - brushSize; x <= cursorX+brushSize; x++ {
+		for y := cursorY - brushSize; y < cursorY+brushSize; y++ {
+			if x < 0 || x >= Width || y < 0 || y >= Height {
+				continue
+			}
+
+			dx := float64(cursorX - x)
+			dy := float64(cursorY - y)
+
+			distance := int(math.Round(math.Sqrt(math.Pow(dx, 2.0) + math.Pow(dy, 2.0))))
+
+			if distance <= brushSize {
+				g.pixels.Set(x, y, Pixel{255, 255, 255, 255})
+			}
+		}
+	}
+}
+
 func (g *Game) Update() error {
 	for y := Height - 1; y >= 0; y-- {
 		for x := Width - 1; x >= 0; x-- {
@@ -64,10 +92,7 @@ func (g *Game) Update() error {
 		}
 	}
 
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
-		x, y := ebiten.CursorPosition()
-		g.pixels.Set(x, y, Pixel{255, 255, 255, 255})
-	}
+	g.applyBrush()
 
 	return nil
 }
