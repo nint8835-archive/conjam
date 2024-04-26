@@ -14,6 +14,16 @@ const Height = 480
 
 const brushSize = 20
 
+func randomColour() Pixel {
+	colours := []Pixel{
+		{255, 0, 0, 255},
+		{0, 255, 0, 255},
+		{0, 0, 255, 255},
+	}
+
+	return colours[rand.IntN(len(colours))]
+}
+
 type PixelArray []byte
 
 func (p PixelArray) At(x, y int) Pixel {
@@ -65,6 +75,8 @@ func (g *Game) applyBrush() {
 		return
 	}
 
+	colour := randomColour()
+
 	cursorX, cursorY := ebiten.CursorPosition()
 
 	for x := cursorX - brushSize; x <= cursorX+brushSize; x++ {
@@ -79,7 +91,7 @@ func (g *Game) applyBrush() {
 			distance := int(math.Round(math.Sqrt(math.Pow(dx, 2.0) + math.Pow(dy, 2.0))))
 
 			if distance <= brushSize {
-				g.pixels.Set(x, y, Pixel{255, 255, 255, 255})
+				g.pixels.Set(x, y, colour)
 			}
 		}
 	}
