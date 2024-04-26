@@ -38,59 +38,37 @@ func (g *Game) Layout(_ int, _ int) (int, int) {
 	return Width, Height
 }
 
-func (g *Game) processPixel(x int, y int) Pixel {
-	currentVal := g.pixels.At(x, y)
-
-	aliveNeighbours := 0
-
-	for dy := -1; dy <= 1; dy++ {
-		for dx := -1; dx <= 1; dx++ {
-			if dx == 0 && dy == 0 {
-				continue
-			}
-
-			xx := x + dx
-			yy := y + dy
-
-			if xx < 0 || xx >= Width || yy < 0 || yy >= Height {
-				continue
-			}
-
-			if g.pixels.At(xx, yy).A == 255 {
-				aliveNeighbours++
-			}
-		}
+func applyGravity(x, y int, pixels PixelArray) {
+	if y == Height-1 {
+		return
 	}
 
-	if currentVal.A == 255 {
-		if aliveNeighbours < 2 || aliveNeighbours > 3 {
-			return Pixel{0, 0, 0, 0}
-		}
-	} else {
-		if aliveNeighbours == 3 {
-			return Pixel{255, 255, 255, 255}
-		}
-	}
+	pixel := pixels.At(x, y)
 
-	return currentVal
+	if pixels.At(x, y+1).A == 0 {
+		pixels.Set(x, y+1, pixel)
+		pixels.Set(x, y, Pixel{0, 0, 0, 0})
+	} else if x > 0 && pixels.At(x-1, y+1).A == 0 {
+		pixels.Set(x-1, y+1, pixel)
+		pixels.Set(x, y, Pixel{0, 0, 0, 0})
+	} else if x < Width-1 && pixels.At(x+1, y+1).A == 0 {
+		pixels.Set(x+1, y+1, pixel)
+		pixels.Set(x, y, Pixel{0, 0, 0, 0})
+	}
 }
 
 func (g *Game) Update() error {
-	newPixels := make(PixelArray, Width*Height*4)
-	copy(newPixels, g.pixels)
-
-	for y := 0; y < Height; y++ {
-		for x := 0; x < Width; x++ {
-			newPixels.Set(x, y, g.processPixel(x, y))
+	for y := Height - 1; y >= 0; y-- {
+		for x := Width - 1; x >= 0; x-- {
+			applyGravity(x, y, g.pixels)
 		}
 	}
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
-		newPixels.Set(x, y, Pixel{255, 255, 255, 255})
+		g.pixels.Set(x, y, Pixel{255, 255, 255, 255})
 	}
 
-	g.pixels = newPixels
 	return nil
 }
 
@@ -116,6 +94,6 @@ func randomState() PixelArray {
 
 func NewGame() *Game {
 	return &Game{
-		pixels: randomState(),
+		pixels: make(PixelArray, Width*Height*4),
 	}
 }
