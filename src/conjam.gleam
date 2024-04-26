@@ -1,5 +1,7 @@
 import canvas/canvas
 
+const max_x = 159
+
 fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   let x = index % canvas.canvas_width
   let y = index / canvas.canvas_width
@@ -36,7 +38,7 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
           |> canvas.set_index(index + canvas.canvas_width - 1, pixel_val)
           |> canvas.set_index(index, #(0, 0, 0, 0))
         }
-        _, _, _, #(0, 0, 0, 0) if x < 159 -> {
+        _, _, _, #(0, 0, 0, 0) if x < max_x -> {
           frame_data
           |> canvas.set_index(index + canvas.canvas_width + 1, pixel_val)
           |> canvas.set_index(index, #(0, 0, 0, 0))
