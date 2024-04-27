@@ -36,26 +36,6 @@ function tickFrame() {
 export function init() {
     const canvas = document.getElementById('canvas')! as HTMLCanvasElement;
 
-    const ctx = canvas.getContext('2d')!;
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-    const colours = [
-        [255, 0, 0, 0],
-        [0, 255, 0],
-        [0, 0, 255],
-    ];
-
-    for (let i = 0; i < imageData.data.length; i += 4) {
-        const [r, g, b] = colours[Math.floor(Math.random() * colours.length)];
-
-        imageData.data[i] = r;
-        imageData.data[i + 1] = g;
-        imageData.data[i + 2] = b;
-        imageData.data[i + 3] = 255;
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-
     canvas.addEventListener('mousedown', (event) => {
         state.mouseDown = true;
         state.mouseX = Math.trunc(event.offsetX / scaleFactor);

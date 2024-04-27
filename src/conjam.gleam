@@ -87,7 +87,7 @@ fn iter_pixels(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
       let new_frame_data =
         frame_data
         |> apply_gravity(index)
-        |> collapse_like(index)
+      // |> collapse_like(index)
 
       iter_pixels(new_frame_data, index - 1)
     }
