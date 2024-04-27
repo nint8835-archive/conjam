@@ -38,3 +38,11 @@ pub fn get_neighbours_matching(
   y: Int,
   predicate: fn(Pixel) -> Bool,
 ) -> Int
+
+@external(javascript, "../ffi.mjs", "ensurePixelExists")
+pub fn ensure_pixel_exists(
+  image_data: ImageData,
+  x: Int,
+  y: Int,
+  callback: fn() -> ImageData,
+) -> ImageData

@@ -12,6 +12,8 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   let x = index % canvas.canvas_width
   let y = index / canvas.canvas_width
 
+  use <- canvas.ensure_pixel_exists(frame_data, x, y)
+
   case y == max_y {
     True -> frame_data
     False -> {
@@ -58,6 +60,8 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
 fn collapse_like(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   let x = index % canvas.canvas_width
   let y = index / canvas.canvas_width
+
+  use <- canvas.ensure_pixel_exists(frame_data, x, y)
 
   case y == 0 {
     True -> frame_data

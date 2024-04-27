@@ -57,10 +57,10 @@ export function mutateFrame(mutator) {
 
 /**
  * Gets neighbouring pixels matching a given function
- * @param {ImageData} imageData
- * @param {number} x
- * @param {number} y
- * @param {(number) -> bool} matcher
+ * @param {ImageData} imageData - The image data.
+ * @param {number} x - The x-coordinate of the pixel.
+ * @param {number} y - The y-coordinate of the pixel.
+ * @param {(number) -> bool} matcher - The function to match the pixel.
  */
 export function getNeighboursMatching(imageData, x, y, matcher) {
   let count = 0;
@@ -87,4 +87,20 @@ export function getNeighboursMatching(imageData, x, y, matcher) {
 
     return count;
   }
+}
+
+/**
+ * Ensures a given pixel exists before applying a callback.
+ * @param {ImageData} imageData - The image data.
+ * @param {number} x - The x-coordinate of the pixel.
+ * @param {number} y - The y-coordinate of the pixel.
+ * @param {() => ImageData} callback - The callback to apply.
+ * @returns {ImageData} - The resulting image data.
+ */
+export function ensurePixelExists(imageData, x, y, callback) {
+  if (!imageData.data[(y * canvasWidth + x) * 4 + 3]) {
+    return imageData;
+  }
+
+  return callback(imageData, x, y);
 }
