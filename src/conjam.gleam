@@ -1,4 +1,5 @@
 import canvas/canvas
+import gleam/bool
 import gleam/float
 import gleam/int
 import gleam/list
@@ -14,47 +15,38 @@ fn apply_gravity(
   y: Int,
 ) -> canvas.ImageData {
   use <- canvas.ensure_pixel_exists(frame_data, x, y)
+  use <- bool.guard(when: y == max_y, return: frame_data)
 
-  case y == max_y {
-    True -> frame_data
-    False -> {
-      let pixel_val =
-        frame_data
-        |> canvas.get_pixel(x, y)
-      let below_pixel_val =
-        frame_data
-        |> canvas.get_pixel(x, y + 1)
-      let below_left_pixel_val =
-        frame_data
-        |> canvas.get_pixel(x - 1, y + 1)
-      let below_right_pixel_val =
-        frame_data
-        |> canvas.get_pixel(x + 1, y + 1)
+  let pixel_val =
+    frame_data
+    |> canvas.get_pixel(x, y)
+  let below_pixel_val =
+    frame_data
+    |> canvas.get_pixel(x, y + 1)
+  let below_left_pixel_val =
+    frame_data
+    |> canvas.get_pixel(x - 1, y + 1)
+  let below_right_pixel_val =
+    frame_data
+    |> canvas.get_pixel(x + 1, y + 1)
 
-      case
-        pixel_val,
-        below_pixel_val,
-        below_left_pixel_val,
-        below_right_pixel_val
-      {
-        0x00000000, _, _, _ -> frame_data
-        _, 0x00000000, _, _ ->
-          frame_data
-          |> canvas.set_pixel(x, y + 1, pixel_val)
-          |> canvas.set_pixel(x, y, 0x00000000)
-        _, _, 0x00000000, _ if x > 0 -> {
-          frame_data
-          |> canvas.set_pixel(x - 1, y + 1, pixel_val)
-          |> canvas.set_pixel(x, y, 0x00000000)
-        }
-        _, _, _, 0x00000000 if x < max_x -> {
-          frame_data
-          |> canvas.set_pixel(x + 1, y + 1, pixel_val)
-          |> canvas.set_pixel(x, y, 0x00000000)
-        }
-        _, _, _, _ -> frame_data
-      }
+  case pixel_val, below_pixel_val, below_left_pixel_val, below_right_pixel_val {
+    0x00000000, _, _, _ -> frame_data
+    _, 0x00000000, _, _ ->
+      frame_data
+      |> canvas.set_pixel(x, y + 1, pixel_val)
+      |> canvas.set_pixel(x, y, 0x00000000)
+    _, _, 0x00000000, _ if x > 0 -> {
+      frame_data
+      |> canvas.set_pixel(x - 1, y + 1, pixel_val)
+      |> canvas.set_pixel(x, y, 0x00000000)
     }
+    _, _, _, 0x00000000 if x < max_x -> {
+      frame_data
+      |> canvas.set_pixel(x + 1, y + 1, pixel_val)
+      |> canvas.set_pixel(x, y, 0x00000000)
+    }
+    _, _, _, _ -> frame_data
   }
 }
 
@@ -64,24 +56,20 @@ fn collapse_like(
   y: Int,
 ) -> canvas.ImageData {
   use <- canvas.ensure_pixel_exists(frame_data, x, y)
+  use <- bool.guard(when: y == 0, return: frame_data)
 
-  case y == 0 {
-    True -> frame_data
-    False -> {
-      let pixel_val =
-        frame_data
-        |> canvas.get_pixel(x, y)
-      let above_pixel_val =
-        frame_data
-        |> canvas.get_pixel(x, y - 1)
+  let pixel_val =
+    frame_data
+    |> canvas.get_pixel(x, y)
+  let above_pixel_val =
+    frame_data
+    |> canvas.get_pixel(x, y - 1)
 
-      case pixel_val == above_pixel_val && pixel_val != 0x00000000 {
-        True ->
-          frame_data
-          |> canvas.set_pixel(x, y, 0x00000000)
-        False -> frame_data
-      }
-    }
+  case pixel_val == above_pixel_val && pixel_val != 0x00000000 {
+    True ->
+      frame_data
+      |> canvas.set_pixel(x, y, 0x00000000)
+    False -> frame_data
   }
 }
 
