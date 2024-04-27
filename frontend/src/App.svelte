@@ -1,8 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { init, store } from "./game";
-
-    $: frameRate = $store.currentFrameTime - $store.lastFrameTime;
+    import { init } from "./game";
+    import Framerate from "./components/Framerate.svelte";
 
     onMount(() => {
         init();
@@ -17,4 +16,4 @@
         width="640"
         height="480"
 ></canvas>
-<div>FPS: {frameRate}</div>
+<Framerate />
