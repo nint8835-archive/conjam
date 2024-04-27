@@ -8,15 +8,6 @@ const max_x = 639
 
 const max_y = 479
 
-fn random_colour() -> canvas.Pixel {
-  let colours = [0xff0000ff, 0x00ff00ff, 0x0000ffff]
-
-  colours
-  |> list.shuffle()
-  |> list.first()
-  |> result.unwrap(0x00000000)
-}
-
 fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   let x = index % canvas.canvas_width
   let y = index / canvas.canvas_width
@@ -89,11 +80,7 @@ fn collapse_like(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   }
 }
 
-fn iter_pixels(
-  frame_data: canvas.ImageData,
-  frame_number: Int,
-  index: Int,
-) -> canvas.ImageData {
+fn iter_pixels(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   case index {
     -1 -> frame_data
     _ -> {
@@ -102,20 +89,18 @@ fn iter_pixels(
         |> apply_gravity(index)
         |> collapse_like(index)
 
-      iter_pixels(new_frame_data, frame_number, index - 1)
+      iter_pixels(new_frame_data, index - 1)
     }
   }
 }
-
-const brush_size = 20
 
 fn apply_brush(
   frame_data: canvas.ImageData,
   mouse_x: Int,
   mouse_y: Int,
+  brush_size: Int,
+  brush_colour: canvas.Pixel,
 ) -> canvas.ImageData {
-  let colour = random_colour()
-
   list.range(-1 * brush_size, brush_size)
   |> list.fold(frame_data, fn(row_data, y) {
     list.range(-1 * brush_size, brush_size)
@@ -138,7 +123,7 @@ fn apply_brush(
         True -> pixel_data
         False -> {
           pixel_data
-          |> canvas.set_pixel(mouse_x + x, mouse_y + y, colour)
+          |> canvas.set_pixel(mouse_x + x, mouse_y + y, brush_colour)
         }
       }
     })
@@ -146,21 +131,22 @@ fn apply_brush(
 }
 
 pub fn draw_frame(
-  frame_number: Int,
   mouse_down: Bool,
   mouse_x: Int,
   mouse_y: Int,
+  brush_size: Int,
+  brush_colour: canvas.Pixel,
 ) {
   use data <- canvas.mutate_frame()
 
   let initial_data = case mouse_down {
     True -> {
       data
-      |> apply_brush(mouse_x, mouse_y)
+      |> apply_brush(mouse_x, mouse_y, brush_size, brush_colour)
     }
     False -> data
   }
 
   initial_data
-  |> iter_pixels(frame_number, canvas.canvas_height * canvas.canvas_width)
+  |> iter_pixels(canvas.canvas_height * canvas.canvas_width)
 }

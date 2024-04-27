@@ -14,4 +14,4 @@
     }
 </script>
 
-<div>FPS: {frameRate}</div>
+<div class="absolute bottom-2 right-2 text-slate-500">FPS: {frameRate}</div>
