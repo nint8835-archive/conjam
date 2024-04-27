@@ -16,10 +16,12 @@ export const store = writable(state);
 const settings = {
     brushSize: 10,
     brushColour: '#ff0000',
+
+    autoTick: true,
 };
 export const settingsStore = writable(settings);
 
-function tickFrame() {
+export function tickFrame() {
     draw_frame(
         state.mouseDown,
         state.mouseX,
@@ -30,7 +32,10 @@ function tickFrame() {
     state.currentFrameTime = performance.now();
     store.update(() => ({ ...state }));
     state.lastFrameTime = state.currentFrameTime;
-    requestAnimationFrame(tickFrame);
+
+    if (settings.autoTick) {
+        requestAnimationFrame(tickFrame);
+    }
 }
 
 export function init() {

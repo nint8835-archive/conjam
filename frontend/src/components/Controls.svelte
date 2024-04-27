@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { settingsStore } from '../game';
+    import { settingsStore, tickFrame } from '../game';
 
     function insertNoise() {
         const canvas = document.getElementById('canvas')! as HTMLCanvasElement;
@@ -61,5 +61,16 @@
     </button>
     <button class="rounded-md bg-teal-600 p-2 transition-colors hover:bg-teal-700" on:click={clearCanvas}>
         Clear canvas
+    </button>
+    <label class="flex flex-row items-center justify-between">
+        Auto tick:
+        <input
+            class="rounded-md bg-slate-900 p-2 outline-none ring-teal-600 transition-all focus:ring-2"
+            type="checkbox"
+            bind:checked={$settingsStore.autoTick}
+        />
+    </label>
+    <button class="rounded-md bg-teal-600 p-2 transition-colors hover:bg-teal-700" on:click={tickFrame}>
+        Tick frame
     </button>
 </div>
