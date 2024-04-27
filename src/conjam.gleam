@@ -20,33 +20,53 @@ fn apply_gravity(
   let pixel_val =
     frame_data
     |> canvas.get_pixel(x, y)
+
+  use <- bool.guard(when: pixel_val == 0x00000000, return: frame_data)
+
   let below_pixel_val =
     frame_data
     |> canvas.get_pixel(x, y + 1)
-  let below_left_pixel_val =
-    frame_data
-    |> canvas.get_pixel(x - 1, y + 1)
-  let below_right_pixel_val =
-    frame_data
-    |> canvas.get_pixel(x + 1, y + 1)
 
-  case pixel_val, below_pixel_val, below_left_pixel_val, below_right_pixel_val {
-    0x00000000, _, _, _ -> frame_data
-    _, 0x00000000, _, _ ->
+  case below_pixel_val {
+    0x00000000 ->
       frame_data
       |> canvas.set_pixel(x, y + 1, pixel_val)
       |> canvas.set_pixel(x, y, 0x00000000)
-    _, _, 0x00000000, _ if x > 0 -> {
-      frame_data
-      |> canvas.set_pixel(x - 1, y + 1, pixel_val)
-      |> canvas.set_pixel(x, y, 0x00000000)
+    _ -> {
+      let below_left_pixel_val = {
+        case x == 0 {
+          True -> 0xffffffff
+          False ->
+            frame_data
+            |> canvas.get_pixel(x - 1, y + 1)
+        }
+      }
+
+      case below_left_pixel_val {
+        0x00000000 ->
+          frame_data
+          |> canvas.set_pixel(x - 1, y + 1, pixel_val)
+          |> canvas.set_pixel(x, y, 0x00000000)
+        _ -> {
+          let below_right_pixel_val = {
+            case x == max_x {
+              True -> 0xffffffff
+              False ->
+                frame_data
+                |> canvas.get_pixel(x + 1, y + 1)
+            }
+          }
+
+          case below_right_pixel_val {
+            0x00000000 ->
+              frame_data
+              |> canvas.set_pixel(x + 1, y + 1, pixel_val)
+              |> canvas.set_pixel(x, y, 0x00000000)
+            _ -> frame_data
+          }
+        }
+      }
     }
-    _, _, _, 0x00000000 if x < max_x -> {
-      frame_data
-      |> canvas.set_pixel(x + 1, y + 1, pixel_val)
-      |> canvas.set_pixel(x, y, 0x00000000)
-    }
-    _, _, _, _ -> frame_data
   }
 }
 
