@@ -1,7 +1,7 @@
 pub type ImageData
 
 pub type Pixel =
-  #(Int, Int, Int, Int)
+  Int
 
 pub const canvas_width = 640
 
@@ -30,3 +30,11 @@ pub fn set_pixel(
 
 @external(javascript, "../ffi.mjs", "mutateFrame")
 pub fn mutate_frame(mutator: fn(ImageData) -> ImageData) -> Nil
+
+@external(javascript, "../ffi.mjs", "getNeighboursMatching")
+pub fn get_neighbours_matching(
+  image_data: ImageData,
+  x: Int,
+  y: Int,
+  predicate: fn(Pixel) -> Bool,
+) -> Int

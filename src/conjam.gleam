@@ -9,12 +9,12 @@ const max_x = 639
 const max_y = 479
 
 fn random_colour() -> canvas.Pixel {
-  let colours = [#(255, 0, 0, 255), #(0, 255, 0, 255), #(0, 0, 255, 255)]
+  let colours = [0xff0000ff, 0x00ff00ff, 0x0000ffff]
 
   colours
   |> list.shuffle()
   |> list.first()
-  |> result.unwrap(#(0, 0, 0, 0))
+  |> result.unwrap(0x00000000)
 }
 
 fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
@@ -43,20 +43,20 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
         below_left_pixel_val,
         below_right_pixel_val
       {
-        #(0, 0, 0, 0), _, _, _ -> frame_data
-        _, #(0, 0, 0, 0), _, _ ->
+        0x00000000, _, _, _ -> frame_data
+        _, 0x00000000, _, _ ->
           frame_data
-          |> canvas.set_index(index + canvas.canvas_width, pixel_val)
-          |> canvas.set_index(index, #(0, 0, 0, 0))
-        _, _, #(0, 0, 0, 0), _ if x > 0 -> {
+          |> canvas.set_pixel(x, y + 1, pixel_val)
+          |> canvas.set_index(index, 0x00000000)
+        _, _, 0x00000000, _ if x > 0 -> {
           frame_data
           |> canvas.set_index(index + canvas.canvas_width - 1, pixel_val)
-          |> canvas.set_index(index, #(0, 0, 0, 0))
+          |> canvas.set_index(index, 0x00000000)
         }
-        _, _, _, #(0, 0, 0, 0) if x < max_x -> {
+        _, _, _, 0x00000000 if x < max_x -> {
           frame_data
           |> canvas.set_index(index + canvas.canvas_width + 1, pixel_val)
-          |> canvas.set_index(index, #(0, 0, 0, 0))
+          |> canvas.set_index(index, 0x00000000)
         }
         _, _, _, _ -> frame_data
       }
@@ -68,23 +68,22 @@ fn collapse_like(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   let x = index % canvas.canvas_width
   let y = index / canvas.canvas_width
 
-  case y == 0 {
+  let index_val = canvas.get_pixel(frame_data, x, y)
+
+  case index_val == 0x00000000 {
     True -> frame_data
     False -> {
-      let pixel_val =
-        frame_data
-        |> canvas.get_index(index)
-      let above_pixel_val =
-        frame_data
-        |> canvas.get_index(index - canvas.canvas_width)
+      let matching =
+        canvas.get_neighbours_matching(frame_data, x, y, fn(pixel) {
+          index_val == pixel
+        })
 
-      case pixel_val, above_pixel_val {
-        #(r1, g1, b1, 255), #(r2, g2, b2, 255)
-          if r1 == r2 && g1 == g2 && b1 == b2
-        ->
+      case matching {
+        0 -> frame_data
+        _ -> {
           frame_data
-          |> canvas.set_index(index, #(0, 0, 0, 0))
-        _, _ -> frame_data
+          |> canvas.set_pixel(x, y, 0x00000000)
+        }
       }
     }
   }

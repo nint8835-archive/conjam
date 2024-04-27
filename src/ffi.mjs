@@ -1,32 +1,38 @@
+const canvasWidth = 640;
+const canvasHeight = 480;
+
 /**
  * Gets the data for a pixel at a given index.
  * @param {ImageData} imageData - The image data.
  * @param {number} index - The index of the pixel.
- * @returns {Array<number>} The pixel data.
+ * @returns {number} The pixel data.
  */
 export function getIndex(imageData, index) {
   const data = imageData.data;
   const baseIndex = index * 4;
-  return [
-    data[baseIndex],
-    data[baseIndex + 1],
-    data[baseIndex + 2],
-    data[baseIndex + 3],
-  ];
+  return (
+    (data[baseIndex] << 24) |
+    (data[baseIndex + 1] << 16) |
+    (data[baseIndex + 2] << 8) |
+    data[baseIndex + 3]
+  );
 }
 
 /**
  * Sets the data for a pixel at a given index.
  * @param {ImageData} imageData - The image data.
  * @param {number} index - The index of the pixel.
- * @param {Array<number>} value - The pixel data.
+ * @param {number} value - The pixel data.
  * @returns {ImageData} - The image data.
  */
 export function setIndex(imageData, index, value) {
-  imageData.data[index * 4] = value[0];
-  imageData.data[index * 4 + 1] = value[1];
-  imageData.data[index * 4 + 2] = value[2];
-  imageData.data[index * 4 + 3] = value[3];
+  const baseIndex = index * 4;
+  const data = imageData.data;
+
+  data[baseIndex] = (value >> 24) & 0xff;
+  data[baseIndex + 1] = (value >> 16) & 0xff;
+  data[baseIndex + 2] = (value >> 8) & 0xff;
+  data[baseIndex + 3] = value & 0xff;
 
   return imageData;
 }
@@ -42,9 +48,43 @@ export function mutateFrame(mutator) {
   const initialImageData = context.getImageData(
     0,
     0,
-    canvas.width,
-    canvas.height
+    canvasWidth,
+    canvasHeight
   );
   const mutatedImageData = mutator(initialImageData);
   context.putImageData(mutatedImageData, 0, 0);
+}
+
+/**
+ * Gets neighbouring pixels matching a given function
+ * @param {ImageData} imageData
+ * @param {number} x
+ * @param {number} y
+ * @param {(number) -> bool} matcher
+ */
+export function getNeighboursMatching(imageData, x, y, matcher) {
+  let count = 0;
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      const newX = x + dx;
+      const newY = y + dy;
+
+      if (
+        newX < 0 ||
+        newX >= canvasWidth ||
+        newY < 0 ||
+        newY >= canvasHeight
+        // (x === newX && y === newY)
+        // (dx !== 0 && dy !== 0)
+      ) {
+        continue;
+      }
+
+      if (matcher(getIndex(imageData, newY * canvasWidth + newX))) {
+        count++;
+      }
+    }
+
+    return count;
+  }
 }
