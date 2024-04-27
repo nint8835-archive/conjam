@@ -64,6 +64,32 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   }
 }
 
+fn collapse_like(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
+  let x = index % canvas.canvas_width
+  let y = index / canvas.canvas_width
+
+  case y == 0 {
+    True -> frame_data
+    False -> {
+      let pixel_val =
+        frame_data
+        |> canvas.get_index(index)
+      let above_pixel_val =
+        frame_data
+        |> canvas.get_index(index - canvas.canvas_width)
+
+      case pixel_val, above_pixel_val {
+        #(r1, g1, b1, 255), #(r2, g2, b2, 255)
+          if r1 == r2 && g1 == g2 && b1 == b2
+        ->
+          frame_data
+          |> canvas.set_index(index, #(0, 0, 0, 0))
+        _, _ -> frame_data
+      }
+    }
+  }
+}
+
 fn iter_pixels(
   frame_data: canvas.ImageData,
   frame_number: Int,
@@ -75,13 +101,14 @@ fn iter_pixels(
       let new_frame_data =
         frame_data
         |> apply_gravity(index)
+        |> collapse_like(index)
 
       iter_pixels(new_frame_data, frame_number, index - 1)
     }
   }
 }
 
-const brush_size = 10
+const brush_size = 20
 
 fn apply_brush(
   frame_data: canvas.ImageData,
