@@ -59,22 +59,21 @@ fn collapse_like(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   let x = index % canvas.canvas_width
   let y = index / canvas.canvas_width
 
-  let index_val = canvas.get_pixel(frame_data, x, y)
-
-  case index_val == 0x00000000 {
+  case y == 0 {
     True -> frame_data
     False -> {
-      let matching =
-        canvas.get_neighbours_matching(frame_data, x, y, fn(pixel) {
-          index_val == pixel
-        })
+      let pixel_val =
+        frame_data
+        |> canvas.get_pixel(x, y)
+      let above_pixel_val =
+        frame_data
+        |> canvas.get_pixel(x, y - 1)
 
-      case matching {
-        0 -> frame_data
-        _ -> {
+      case pixel_val == above_pixel_val && pixel_val != 0x00000000 {
+        True ->
           frame_data
           |> canvas.set_pixel(x, y, 0x00000000)
-        }
+        False -> frame_data
       }
     }
   }
@@ -87,7 +86,7 @@ fn iter_pixels(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
       let new_frame_data =
         frame_data
         |> apply_gravity(index)
-      // |> collapse_like(index)
+        |> collapse_like(index)
 
       iter_pixels(new_frame_data, index - 1)
     }
