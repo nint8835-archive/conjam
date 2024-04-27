@@ -9,9 +9,9 @@
     });
 </script>
 
-<div class="w-[640px]">
+<div class="flex w-[640px] flex-col">
     <canvas
-        class="scale h-[480px] w-full bg-black bg-opacity-25"
+        class="scale z-10 h-[480px] w-full bg-black"
         style="image-rendering: pixelated"
         id="canvas"
         width="640"
