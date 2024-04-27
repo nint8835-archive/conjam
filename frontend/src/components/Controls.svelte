@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { settingsStore, tickFrame } from '../game';
+    import { store, tickFrame } from '../game';
 
     function insertNoise() {
         const canvas = document.getElementById('canvas')! as HTMLCanvasElement;
@@ -45,7 +45,7 @@
             min="0"
             max="50"
             step="1"
-            bind:value={$settingsStore.brushSize}
+            bind:value={$store.brushSize}
         />
     </label>
     <label class="flex flex-row items-center justify-between">
@@ -53,7 +53,7 @@
         <input
             class="rounded-md bg-slate-900 p-2 outline-none ring-teal-600 transition-all focus:ring-2"
             type="color"
-            bind:value={$settingsStore.brushColour}
+            bind:value={$store.brushColour}
         />
     </label>
     <button class="rounded-md bg-teal-600 p-2 transition-colors hover:bg-teal-700" on:click={insertNoise}>
@@ -67,7 +67,7 @@
         <input
             class="rounded-md bg-slate-900 p-2 outline-none ring-teal-600 transition-all focus:ring-2"
             type="checkbox"
-            bind:checked={$settingsStore.autoTick}
+            bind:checked={$store.autoTick}
         />
     </label>
     <button class="rounded-md bg-teal-600 p-2 transition-colors hover:bg-teal-700" on:click={tickFrame}>

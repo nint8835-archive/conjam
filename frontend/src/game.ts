@@ -3,37 +3,40 @@ import { writable } from 'svelte/store';
 
 const scaleFactor = 1;
 
-const state = {
+let state = {
     lastFrameTime: performance.now(),
     currentFrameTime: performance.now(),
 
     mouseDown: false,
     mouseX: 0,
     mouseY: 0,
-};
-export const store = writable(state);
 
-const settings = {
     brushSize: 10,
     brushColour: '#ff0000',
 
     autoTick: true,
 };
-export const settingsStore = writable(settings);
+export const store = writable(state);
+store.subscribe((value) => {
+    state = value;
+});
 
 export function tickFrame() {
     draw_frame(
         state.mouseDown,
         state.mouseX,
         state.mouseY,
-        settings.brushSize,
-        (parseInt(settings.brushColour.substring(1), 16) << 8) | 0xff,
+        state.brushSize,
+        (parseInt(state.brushColour.substring(1), 16) << 8) | 0xff,
     );
-    state.currentFrameTime = performance.now();
-    store.update(() => ({ ...state }));
-    state.lastFrameTime = state.currentFrameTime;
 
-    if (settings.autoTick) {
+    store.update((lastState) => ({
+        ...lastState,
+        lastFrameTime: lastState.currentFrameTime,
+        currentFrameTime: performance.now(),
+    }));
+
+    if (state.autoTick) {
         requestAnimationFrame(tickFrame);
     }
 }
