@@ -3,20 +3,20 @@ import { writable } from 'svelte/store';
 
 const scaleFactor = 1;
 const state = {
-    frameNumber : 0,
-    lastFrameTime : performance.now(),
-    currentFrameTime : performance.now(),
-    mouseDown : false,
-    mouseX : 0,
-    mouseY : 0,
-}
+    frameNumber: 0,
+    lastFrameTime: performance.now(),
+    currentFrameTime: performance.now(),
+    mouseDown: false,
+    mouseX: 0,
+    mouseY: 0,
+};
 export const store = writable(state);
 
 function tickFrame() {
     draw_frame(state.frameNumber, state.mouseDown, state.mouseX, state.mouseY);
     state.currentFrameTime = performance.now();
     state.frameNumber++;
-    store.update(() => ({...state}));
+    store.update(() => ({ ...state }));
     state.lastFrameTime = state.currentFrameTime;
     requestAnimationFrame(tickFrame);
 }

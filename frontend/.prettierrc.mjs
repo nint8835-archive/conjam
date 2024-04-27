@@ -5,5 +5,13 @@ export default {
     singleQuote: true,
     printWidth: 120,
     tabWidth: 4,
-    plugins: ['prettier-plugin-tailwindcss'],
+    plugins: ['prettier-plugin-svelte', 'prettier-plugin-tailwindcss'],
+    overrides: [
+        {
+            files: '*.svelte',
+            options: {
+                parser: 'svelte',
+            },
+        },
+    ],
 };
