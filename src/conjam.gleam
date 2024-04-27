@@ -8,10 +8,11 @@ const max_x = 639
 
 const max_y = 479
 
-fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
-  let x = index % canvas.canvas_width
-  let y = index / canvas.canvas_width
-
+fn apply_gravity(
+  frame_data: canvas.ImageData,
+  x: Int,
+  y: Int,
+) -> canvas.ImageData {
   use <- canvas.ensure_pixel_exists(frame_data, x, y)
 
   case y == max_y {
@@ -19,16 +20,16 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
     False -> {
       let pixel_val =
         frame_data
-        |> canvas.get_index(index)
+        |> canvas.get_pixel(x, y)
       let below_pixel_val =
         frame_data
-        |> canvas.get_index(index + canvas.canvas_width)
+        |> canvas.get_pixel(x, y + 1)
       let below_left_pixel_val =
         frame_data
-        |> canvas.get_index(index + canvas.canvas_width - 1)
+        |> canvas.get_pixel(x - 1, y + 1)
       let below_right_pixel_val =
         frame_data
-        |> canvas.get_index(index + canvas.canvas_width + 1)
+        |> canvas.get_pixel(x + 1, y + 1)
 
       case
         pixel_val,
@@ -40,16 +41,16 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
         _, 0x00000000, _, _ ->
           frame_data
           |> canvas.set_pixel(x, y + 1, pixel_val)
-          |> canvas.set_index(index, 0x00000000)
+          |> canvas.set_pixel(x, y, 0x00000000)
         _, _, 0x00000000, _ if x > 0 -> {
           frame_data
-          |> canvas.set_index(index + canvas.canvas_width - 1, pixel_val)
-          |> canvas.set_index(index, 0x00000000)
+          |> canvas.set_pixel(x - 1, y + 1, pixel_val)
+          |> canvas.set_pixel(x, y, 0x00000000)
         }
         _, _, _, 0x00000000 if x < max_x -> {
           frame_data
-          |> canvas.set_index(index + canvas.canvas_width + 1, pixel_val)
-          |> canvas.set_index(index, 0x00000000)
+          |> canvas.set_pixel(x + 1, y + 1, pixel_val)
+          |> canvas.set_pixel(x, y, 0x00000000)
         }
         _, _, _, _ -> frame_data
       }
@@ -57,10 +58,11 @@ fn apply_gravity(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
   }
 }
 
-fn collapse_like(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
-  let x = index % canvas.canvas_width
-  let y = index / canvas.canvas_width
-
+fn collapse_like(
+  frame_data: canvas.ImageData,
+  x: Int,
+  y: Int,
+) -> canvas.ImageData {
   use <- canvas.ensure_pixel_exists(frame_data, x, y)
 
   case y == 0 {
@@ -84,13 +86,16 @@ fn collapse_like(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
 }
 
 fn iter_pixels(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
+  let x = index % canvas.canvas_width
+  let y = index / canvas.canvas_width
+
   case index {
     -1 -> frame_data
     _ -> {
       let new_frame_data =
         frame_data
-        |> apply_gravity(index)
-        |> collapse_like(index)
+        |> apply_gravity(x, y)
+        |> collapse_like(x, y)
 
       iter_pixels(new_frame_data, index - 1)
     }
