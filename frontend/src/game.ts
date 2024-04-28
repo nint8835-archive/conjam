@@ -13,7 +13,7 @@ let state = {
     mouseY: 0,
 
     brushSize: 10,
-    brushColour: '#ff0000',
+    brushColour: 'ff0000ff',
 
     autoTick: true,
 };
@@ -29,7 +29,7 @@ export function tickFrame() {
         state.mouseX,
         state.mouseY,
         state.brushSize,
-        (parseInt(state.brushColour.substring(1), 16) << 8) | 0xff,
+        parseInt(state.brushColour, 16),
     );
 
     store.update((lastState) => ({

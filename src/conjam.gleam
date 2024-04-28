@@ -1,6 +1,5 @@
 import brush.{apply_brush}
 import canvas
-import collapse.{collapse_like}
 import constants.{max_x, max_y}
 import gravity.{apply_gravity}
 
@@ -48,7 +47,6 @@ fn iter_pixels(
       let new_frame_data =
         frame_data
         |> apply_gravity(x, y, next_pixel_offset)
-        |> collapse_like(x, y)
 
       iter_pixels(new_frame_data, x + next_pixel_offset, y, next_pixel_offset)
     }

@@ -66,7 +66,8 @@
         Brush colour:
         <input
             class="rounded-md bg-zinc-800 p-2 outline-none ring-teal-600 transition-all focus:ring-2"
-            type="color"
+            type="text"
+            size="8"
             bind:value={$store.brushColour}
         />
     </label>

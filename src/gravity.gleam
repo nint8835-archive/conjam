@@ -1,6 +1,7 @@
 import canvas
 import constants.{max_x, max_y}
 import gleam/bool
+import properties
 
 pub fn apply_gravity(
   frame_data: canvas.ImageData,
@@ -15,7 +16,10 @@ pub fn apply_gravity(
     frame_data
     |> canvas.get_pixel(x, y)
 
-  use <- bool.guard(when: pixel_val == 0x00000000, return: frame_data)
+  use <- bool.guard(
+    when: !properties.has_property(pixel_val, properties.experiences_gravity),
+    return: frame_data,
+  )
 
   let below_pixel_val =
     frame_data
