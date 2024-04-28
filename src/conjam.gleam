@@ -144,11 +144,20 @@ fn apply_brush(
         |> result.unwrap(0.0)
         |> float.round()
 
-      case distance > brush_size {
+      let new_x = mouse_x + x
+      let new_y = mouse_y + y
+
+      case
+        distance > brush_size
+        || new_x < 0
+        || new_x > max_x
+        || new_y < 0
+        || new_y > max_y
+      {
         True -> pixel_data
         False -> {
           pixel_data
-          |> canvas.set_pixel(mouse_x + x, mouse_y + y, brush_colour)
+          |> canvas.set_pixel(new_x, new_y, brush_colour)
         }
       }
     })
