@@ -1,40 +1,11 @@
 <script lang="ts">
     import { twMerge } from 'tailwind-merge';
     import { store, tickFrame } from '../game';
+    import PropertyEditor from './PropertyEditor.svelte';
     import ChevronDoubleDown from './icons/ChevronDoubleDown.svelte';
 
     let controlsDiv: HTMLDivElement | undefined;
     let showControls = false;
-
-    function insertNoise() {
-        const canvas = document.getElementById('canvas')! as HTMLCanvasElement;
-        const ctx = canvas.getContext('2d')!;
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-        const colours = [
-            [255, 0, 0, 0],
-            [0, 255, 0],
-            [0, 0, 255],
-        ];
-
-        for (let i = 0; i < imageData.data.length; i += 4) {
-            if (imageData.data[i + 3]) {
-                continue;
-            }
-
-            const y = Math.floor(i / (canvas.width * 4));
-
-            // const [r, g, b] = colours[Math.floor(Math.random() * colours.length)];
-            const [r, g, b] = colours[y % colours.length];
-
-            imageData.data[i] = r;
-            imageData.data[i + 1] = g;
-            imageData.data[i + 2] = b;
-            imageData.data[i + 3] = 255;
-        }
-
-        ctx.putImageData(imageData, 0, 0);
-    }
 
     function clearCanvas() {
         const canvas = document.getElementById('canvas')! as HTMLCanvasElement;
@@ -62,18 +33,6 @@
             bind:value={$store.brushSize}
         />
     </label>
-    <label class="flex flex-row items-center justify-between">
-        Brush colour:
-        <input
-            class="rounded-md bg-zinc-800 p-2 outline-none ring-teal-600 transition-all focus:ring-2"
-            type="text"
-            size="8"
-            bind:value={$store.brushColour}
-        />
-    </label>
-    <button class="rounded-md bg-teal-600 p-2 transition-colors hover:bg-teal-700" on:click={insertNoise}>
-        Insert noise
-    </button>
     <button class="rounded-md bg-teal-600 p-2 transition-colors hover:bg-teal-700" on:click={clearCanvas}>
         Clear canvas
     </button>
@@ -88,6 +47,7 @@
     <button class="rounded-md bg-teal-600 p-2 transition-colors hover:bg-teal-700" on:click={tickFrame}>
         Tick frame
     </button>
+    <PropertyEditor />
 </div>
 
 {#if controlsDiv}
