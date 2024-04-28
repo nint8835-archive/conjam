@@ -13,6 +13,7 @@ fn apply_gravity(
   frame_data: canvas.ImageData,
   x: Int,
   y: Int,
+  next_pixel_offset: Int,
 ) -> canvas.ImageData {
   use <- canvas.ensure_pixel_exists(frame_data, x, y)
   use <- bool.guard(when: y == max_y, return: frame_data)
@@ -33,34 +34,38 @@ fn apply_gravity(
       |> canvas.set_pixel(x, y + 1, pixel_val)
       |> canvas.set_pixel(x, y, 0x00000000)
     _ -> {
-      let below_left_pixel_val = {
-        case x == 0 {
+      let next_x = x + next_pixel_offset
+
+      let below_next_pixel_val = {
+        case next_x > max_x || next_x < 0 {
           True -> 0xffffffff
           False ->
             frame_data
-            |> canvas.get_pixel(x - 1, y + 1)
+            |> canvas.get_pixel(next_x, y + 1)
         }
       }
 
-      case below_left_pixel_val {
+      case below_next_pixel_val {
         0x00000000 ->
           frame_data
-          |> canvas.set_pixel(x - 1, y + 1, pixel_val)
+          |> canvas.set_pixel(next_x, y + 1, pixel_val)
           |> canvas.set_pixel(x, y, 0x00000000)
         _ -> {
-          let below_right_pixel_val = {
-            case x == max_x {
+          let prev_x = x - next_pixel_offset
+
+          let below_prev_pixel_val = {
+            case prev_x > max_x || prev_x < 0 {
               True -> 0xffffffff
               False ->
                 frame_data
-                |> canvas.get_pixel(x + 1, y + 1)
+                |> canvas.get_pixel(prev_x, y + 1)
             }
           }
 
-          case below_right_pixel_val {
+          case below_prev_pixel_val {
             0x00000000 ->
               frame_data
-              |> canvas.set_pixel(x + 1, y + 1, pixel_val)
+              |> canvas.set_pixel(prev_x, y + 1, pixel_val)
               |> canvas.set_pixel(x, y, 0x00000000)
             _ -> frame_data
           }
@@ -93,19 +98,23 @@ fn collapse_like(
   }
 }
 
-fn iter_pixels(frame_data: canvas.ImageData, index: Int) -> canvas.ImageData {
-  let x = index % canvas.canvas_width
-  let y = index / canvas.canvas_width
-
-  case index {
-    -1 -> frame_data
-    _ -> {
+fn iter_pixels(
+  frame_data: canvas.ImageData,
+  x: Int,
+  y: Int,
+  next_pixel_offset: Int,
+) -> canvas.ImageData {
+  case x, y {
+    _, -1 -> frame_data
+    -1, _ -> iter_pixels(frame_data, max_x, y - 1, next_pixel_offset)
+    x, _ if x > max_x -> iter_pixels(frame_data, 0, y - 1, next_pixel_offset)
+    _, _ -> {
       let new_frame_data =
         frame_data
-        |> apply_gravity(x, y)
+        |> apply_gravity(x, y, next_pixel_offset)
         |> collapse_like(x, y)
 
-      iter_pixels(new_frame_data, index - 1)
+      iter_pixels(new_frame_data, x + next_pixel_offset, y, next_pixel_offset)
     }
   }
 }
@@ -147,6 +156,7 @@ fn apply_brush(
 }
 
 pub fn draw_frame(
+  frame_number: Int,
   mouse_down: Bool,
   mouse_x: Int,
   mouse_y: Int,
@@ -163,6 +173,14 @@ pub fn draw_frame(
     False -> data
   }
 
+  let initial_move_direction = 2 * { frame_number % 2 } - 1
+
+  let initial_x = case initial_move_direction {
+    -1 -> max_x
+    1 -> 0
+    _ -> panic("Mathematically impossible")
+  }
+
   initial_data
-  |> iter_pixels(canvas.canvas_height * canvas.canvas_width)
+  |> iter_pixels(initial_x, max_y, initial_move_direction)
 }

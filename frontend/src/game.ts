@@ -4,6 +4,7 @@ import { writable } from 'svelte/store';
 const scaleFactor = 1;
 
 let state = {
+    frameNumber: 0,
     lastFrameTime: performance.now(),
     currentFrameTime: performance.now(),
 
@@ -23,6 +24,7 @@ store.subscribe((value) => {
 
 export function tickFrame() {
     draw_frame(
+        state.frameNumber,
         state.mouseDown,
         state.mouseX,
         state.mouseY,
@@ -34,6 +36,7 @@ export function tickFrame() {
         ...lastState,
         lastFrameTime: lastState.currentFrameTime,
         currentFrameTime: performance.now(),
+        frameNumber: lastState.frameNumber + 1,
     }));
 
     if (state.autoTick) {
