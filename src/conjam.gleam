@@ -76,19 +76,19 @@ fn collapse_like(
   y: Int,
 ) -> canvas.ImageData {
   use <- canvas.ensure_pixel_exists(frame_data, x, y)
-  use <- bool.guard(when: y == 0, return: frame_data)
+  use <- bool.guard(when: y == max_y, return: frame_data)
 
   let pixel_val =
     frame_data
     |> canvas.get_pixel(x, y)
-  let above_pixel_val =
+  let below_pixel_val =
     frame_data
-    |> canvas.get_pixel(x, y - 1)
+    |> canvas.get_pixel(x, y + 1)
 
-  case pixel_val == above_pixel_val && pixel_val != 0x00000000 {
+  case pixel_val == below_pixel_val && pixel_val != 0x00000000 {
     True ->
       frame_data
-      |> canvas.set_pixel(x, y, 0x00000000)
+      |> canvas.set_pixel(x, y + 1, 0x00000000)
     False -> frame_data
   }
 }

@@ -22,7 +22,10 @@
                 continue;
             }
 
-            const [r, g, b] = colours[Math.floor(Math.random() * colours.length)];
+            const y = Math.floor(i / (canvas.width * 4));
+
+            // const [r, g, b] = colours[Math.floor(Math.random() * colours.length)];
+            const [r, g, b] = colours[y % colours.length];
 
             imageData.data[i] = r;
             imageData.data[i + 1] = g;
