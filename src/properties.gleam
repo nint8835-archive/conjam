@@ -1,5 +1,8 @@
 import gleam/int
 
+// 00000000 00000000 00000001 00000000
+pub const floats = 0x00000100
+
 // 00000000 00000000 00000000 00000001
 pub const experiences_gravity = 0x00000001
 

@@ -2,6 +2,7 @@
     import { store } from '../game';
 
     const propertyDescriptions: Record<number, string> = {
+        24: 'Floats',
         32: 'Enable gravity',
     };
 
@@ -22,7 +23,7 @@
         {#each Array(4) as _, groupIndex}
             <div class="flex flex-1 justify-between">
                 {#each Array(8) as _, i}
-                    <div class="flex flex-col items-center justify-between gap-2">
+                    <div class="flex flex-col items-center gap-2">
                         <input type="checkbox" bind:checked={propertyValues[8 * groupIndex + i]} />
                         <div style:writing-mode="vertical-lr">
                             {propertyDescriptions[8 * groupIndex + i + 1] || ''}
