@@ -104,3 +104,13 @@ export function ensurePixelExists(imageData, x, y, callback) {
 
   return callback(imageData, x, y);
 }
+
+/**
+ * Returns whether a given pixel value has a given property.
+ * @param {number} pixelVal - The pixel value.
+ * @param {number} property - The property.
+ * @returns {bool} - Whether the pixel value has the property.
+ */
+export function hasProperty(pixelVal, property) {
+  return !!(pixelVal & property);
+}
