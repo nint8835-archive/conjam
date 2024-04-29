@@ -7,6 +7,10 @@
 
     let propertyValues = $store.brushColour.split('').map((v) => v === '1');
 
+    store.subscribe((value) => {
+        propertyValues = value.brushColour.split('').map((v) => v === '1');
+    });
+
     $: {
         $store.brushColour = propertyValues.map((v) => (v ? '1' : '0')).join('');
     }
