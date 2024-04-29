@@ -2,6 +2,8 @@
     import { store } from '../game';
 
     const propertyDescriptions: Record<number, string> = {
+        16: 'Grows',
+        23: 'Causes growth',
         24: 'Floats',
         32: 'Enable gravity',
     };
