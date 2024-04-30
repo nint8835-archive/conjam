@@ -1,6 +1,7 @@
 import brush.{apply_brush}
 import canvas
 import constants.{max_x, max_y}
+import fluid.{apply_fluid}
 import gravity.{apply_gravity}
 import growth.{apply_growth}
 
@@ -48,6 +49,7 @@ fn iter_pixels(
       let new_frame_data =
         frame_data
         |> apply_growth(x, y, next_pixel_offset)
+        |> apply_fluid(x, y, next_pixel_offset)
         |> apply_gravity(x, y, next_pixel_offset)
 
       iter_pixels(new_frame_data, x + next_pixel_offset, y, next_pixel_offset)

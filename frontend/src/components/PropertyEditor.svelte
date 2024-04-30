@@ -3,6 +3,7 @@
 
     const propertyDescriptions: Record<number, string> = {
         16: 'Grows',
+        22: 'Fluid',
         23: 'Causes growth',
         24: 'Floats',
         32: 'Enable gravity',
