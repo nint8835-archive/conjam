@@ -13,7 +13,7 @@ let state = {
     mouseY: 0,
 
     brushSize: 10,
-    brushColour: '11111111000000001111111111111111',
+    brushColour: '11111111110110001000000011111111',
 
     autoTick: true,
 };

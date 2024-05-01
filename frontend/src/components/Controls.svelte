@@ -52,7 +52,7 @@
 
 {#if controlsDiv}
     <button
-        class="flex items-center justify-between rounded-b-lg bg-zinc-950 p-2 text-xl font-semibold text-teal-700 transition-all hover:bg-teal-700 hover:text-white"
+        class="flex w-full items-center justify-between rounded-b-lg bg-zinc-950 p-2 text-xl font-semibold text-teal-700 transition-all hover:bg-teal-700 hover:text-white"
         style:transform={showControls ? 'none' : `translateY(-${controlsDiv?.clientHeight || '300'}px)`}
         on:click={() => {
             showControls = !showControls;
