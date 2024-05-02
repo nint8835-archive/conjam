@@ -8,16 +8,6 @@
         24: 'Floats',
         32: 'Enable gravity',
     };
-
-    let propertyValues = $store.brushColour.split('').map((v) => v === '1');
-
-    store.subscribe((value) => {
-        propertyValues = value.brushColour.split('').map((v) => v === '1');
-    });
-
-    $: {
-        $store.brushColour = propertyValues.map((v) => (v ? '1' : '0')).join('');
-    }
 </script>
 
 <div class="col-span-2 flex flex-col items-center">
@@ -26,10 +16,20 @@
         {#each Array(4) as _, groupIndex}
             <div class="flex flex-1 justify-between">
                 {#each Array(8) as _, i}
+                    {@const index = 8 * groupIndex + i}
+                    {@const checked = $store.brushColour[index] === '1'}
                     <div class="flex flex-col items-center gap-2">
-                        <input type="checkbox" bind:checked={propertyValues[8 * groupIndex + i]} />
+                        <input
+                            type="checkbox"
+                            {checked}
+                            on:change={() => {
+                                const arr = $store.brushColour.split('');
+                                arr[index] = checked ? '0' : '1';
+                                $store.brushColour = arr.join('');
+                            }}
+                        />
                         <div style:writing-mode="vertical-lr">
-                            {propertyDescriptions[8 * groupIndex + i + 1] || ''}
+                            {propertyDescriptions[index] || ''}
                         </div>
                     </div>
                 {/each}
