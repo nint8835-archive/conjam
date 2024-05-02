@@ -29,7 +29,7 @@
                             }}
                         />
                         <div style:writing-mode="vertical-lr">
-                            {propertyDescriptions[index] || ''}
+                            {propertyDescriptions[index + 1] || ''}
                         </div>
                     </div>
                 {/each}
